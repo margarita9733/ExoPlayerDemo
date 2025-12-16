@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">ExoPlayerDemo</string>
+    <string name="home_toolbar_title">Треки с устройства</string>
+    <string name="home_no_data_provided_placeholder">Для работы с треками приложению необходимо разрешение на доступ к файлам</string>
+    <string name="provide_tracks">Разрешить доступ к файлам</string>
+    <string name="retry">Попробовать ещё раз</string>
+    <string name="no_tracks_found">Нет доступных файлов</string>
+    <string name="content_description">content_description</string>
+    <string name="playback_service_description">The app\'s service for music playback</string>
 </resources>
