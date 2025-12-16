@@ -1,7 +1,15 @@
 package ru.margarita9733.exoplayerdemo.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -13,6 +21,7 @@ import kotlinx.serialization.Serializable
 import ru.margarita9733.exoplayerdemo.ui.AppState
 import ru.margarita9733.exoplayerdemo.ui.audioAccessRequired.AudioAccessRequiredScreenRoot
 import ru.margarita9733.exoplayerdemo.ui.home.HomeScreenRoot
+import ru.margarita9733.exoplayerdemo.ui.player.PlayerScreenRoot
 
 @Serializable
 object HomeScreenRoute
@@ -20,12 +29,19 @@ object HomeScreenRoute
 @Serializable
 object AudioAccessRequiredScreenRoute
 
+@Serializable
+object PlayerScreenRoute
+
 fun NavController.navigateToAudioAccessRequiredScreenRoute(navOptions: NavOptions? = null) {
     navigate(route = AudioAccessRequiredScreenRoute, navOptions)
 }
 
 fun NavController.navigateToHomeScreenRoute(navOptions: NavOptions? = null) {
     navigate(route = HomeScreenRoute, navOptions)
+}
+
+fun NavController.navigateToPlayerScreenRoute(navOptions: NavOptions? = null) {
+    navigate(route = PlayerScreenRoute, navOptions)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +74,12 @@ fun AppNavHost(
     {
         composable<HomeScreenRoute> {
             HomeScreenRoot(
-                onNavigateToPlayer = { },
+                onNavigateToPlayer = {
+                    navController.navigateToPlayerScreenRoute(
+                        navOptions {
+                            launchSingleTop = true
+                        })
+                },
                 paddingValues = paddingValues,
                 playerStateFlow = appState.playerStateFlow,
                 audioAccessPermissionState = appState.audioAccessPermissionState,
@@ -70,6 +91,31 @@ fun AppNavHost(
             AudioAccessRequiredScreenRoot(
                 onNavigateToHome = onReturnFromNavigateToAudioAccessRequired,
                 onTogglePermission = appState.onTogglePermission
+            )
+        }
+
+        composable<PlayerScreenRoute>(enterTransition = {
+            fadeIn(
+                animationSpec = tween(
+                    300, easing = LinearEasing
+                )
+            ) + slideIntoContainer(
+                animationSpec = tween(300, easing = EaseIn),
+                towards = AnimatedContentTransitionScope.SlideDirection.Up
+            )
+        }, popExitTransition = {
+            fadeOut(
+                animationSpec = tween(
+                    300, easing = LinearEasing
+                )
+            ) + slideOutOfContainer(
+                animationSpec = tween(300, easing = EaseOut),
+                towards = AnimatedContentTransitionScope.SlideDirection.Down
+            )
+        }) {
+            PlayerScreenRoot(
+                toolbarHeight = TopAppBarDefaults.MediumAppBarCollapsedHeight,
+                playerStateFlow = appState.playerStateFlow,
             )
         }
     }
