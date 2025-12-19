@@ -6,18 +6,16 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.core.net.toUri
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.margarita9733.exoplayerdemo.data.model.Track
 import ru.margarita9733.exoplayerdemo.domain.AppRepository
 
 class AppRepositoryImpl(
-    private val appScope: CoroutineScope,
-    private val context: Context
+    private val appContext: Context,
+    private val ioDispatcher: CoroutineDispatcher
 ) : AppRepository {
 
     private val _tracksFlow: MutableStateFlow<List<Track>> = MutableStateFlow(emptyList())
@@ -25,14 +23,12 @@ class AppRepositoryImpl(
 
     override fun getTracksAsFlow(): Flow<List<Track>> = tracksFlow
 
-    override fun loadTracks() {
-        appScope.launch {
-            _tracksFlow.value = getUserTracks()
-        }
+    override suspend fun loadTracks() {
+        _tracksFlow.value = getUserTracks()
     }
 
     private suspend fun getUserTracks(): List<Track> =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
 
             val tracks = mutableListOf<Track>()
 
@@ -59,7 +55,7 @@ class AppRepositoryImpl(
             val selectionArgs = null
             val sortOrder = "${MediaStore.Audio.Media.DISPLAY_NAME} ASC"
 
-            context.contentResolver.query(
+            appContext.contentResolver.query(
                 collection,
                 projection,
                 selection,
@@ -111,4 +107,3 @@ class AppRepositoryImpl(
             return@withContext tracks
         }
 }
-

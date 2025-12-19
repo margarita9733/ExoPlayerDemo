@@ -6,5 +6,5 @@ import ru.margarita9733.exoplayerdemo.data.model.Track
 interface AppRepository{
 
     fun getTracksAsFlow(): Flow<List<Track>>
-    fun loadTracks()
+    suspend fun loadTracks()
 }

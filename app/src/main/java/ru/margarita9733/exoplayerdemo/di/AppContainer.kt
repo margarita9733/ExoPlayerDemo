@@ -8,9 +8,10 @@ import ru.margarita9733.exoplayerdemo.data.AppRepositoryImpl
 
 class AppContainer(private val appContext: Context) {
     private val dispatcherDefault = Dispatchers.Default
+    private val dispatcherIO = Dispatchers.IO
 
     private val applicationScope: CoroutineScope =
-        CoroutineScope(SupervisorJob() + dispatcherDefault)
+        CoroutineScope(SupervisorJob() + dispatcherIO)
 
-    val appRepository = AppRepositoryImpl(applicationScope, appContext)
+    val appRepository = AppRepositoryImpl( appContext, ioDispatcher = dispatcherIO)
 }

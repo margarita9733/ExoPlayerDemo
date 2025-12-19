@@ -41,7 +41,6 @@ class MainViewModel(
     private val _permissionsStateFlow: MutableStateFlow<AudioAccessPermissionState> =
         MutableStateFlow(AudioAccessPermissionState.UNKNOWN)
 
-
     val permissionStateFlow: StateFlow<AudioAccessPermissionState> =
         _permissionsStateFlow
             .onEach { permissionState ->
